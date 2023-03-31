@@ -29,7 +29,7 @@ BLUE2 = (0, 100, 255)
 BLACK = (0, 0, 0)
 
 BLOCK_SIZE = 20
-SPEED = 40
+SPEED = 15
 
 class SnakeGame:
     # Initialize the game with a specified width and height
@@ -83,27 +83,44 @@ class SnakeGame:
                     elif event.key == pygame.K_UP:
                         self.direction = Direction.UP
                     if event.key == pygame.K_DOWN:
-                        self.direction = Direction.DOWN    
-                        
-                        
+                        self.direction = Direction.DOWN              
                 
         # 2. Move the snake
         self._move(self.direction)
         self.snake.insert(0, self.head)
         
         # 3. Check if game over
-        
+        game_over = False
+        if self._is_collision():
+                game_over = True
+                return game_over, self.score
+            
         # 4. Place new food or just move
-        
+        if self.head == self.food:
+            self.score += 1
+            self._place_food()
+        else:
+            self.snake.pop() 
+             
         # 5. Update ui and clock
         self._update_ui()
         self.clock.tick(SPEED)
         
         # 6. Return game over and score
-        game_over = False # Initialize game over flag to False
-        return game_over, self.score # Return the game over flag and current score
-        pass
+        return game_over, self.score 
+    
+    # Method to detect collision    
+    def _is_collision(self):
+        #hits boundary
+        if self.head.x > self.w - BLOCK_SIZE or self.head.x < 0 or self.head.y > self.h - BLOCK_SIZE or self.head.y  < 0:
+            return True
+        # hits itself
+        if self.head in self.snake[1:]:
+                return True
         
+        return False
+    
+    # Method to update UI to reflect the current game state.    
     def _update_ui(self):
         # Fills the display with a black color to clear the previous state of the game.
         self.display.fill(BLACK)
@@ -111,7 +128,7 @@ class SnakeGame:
         # Draw the snake
         for pt in self.snake:
                 pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-                pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
+                pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12)) # second slightly smaller rectangle to create 3d effecct 
                 
         # Draw the food
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE )) 
