@@ -63,10 +63,22 @@ class SnakeGame:
         x = random.randint(0, (self.w-BLOCK_SIZE)//BLOCK_SIZE )*BLOCK_SIZE
         y = random.randint(0, (self.h-BLOCK_SIZE)//BLOCK_SIZE )*BLOCK_SIZE
         
+        # Check if the food is within the display boundaries, and if not, regenerate the food
+        while x >= self.w or y >= self.h:
+            x = random.randint(0, (self.w-BLOCK_SIZE)//BLOCK_SIZE )*BLOCK_SIZE
+            y = random.randint(0, (self.h-BLOCK_SIZE)//BLOCK_SIZE )*BLOCK_SIZE
+        
         # Create a new Point object with the generated coordinates
         self.food = Point(x, y)
         
-        # Create a new Point object with the generated coordinates
+        # Load the food image
+        food_img = pygame.image.load("baby.png").convert_alpha()
+        food_img = pygame.transform.scale(food_img, (BLOCK_SIZE, BLOCK_SIZE))
+        
+        # Draw the food image onto the game board
+        self.display.blit(food_img, (self.food.x, self.food.y))
+        
+        # Check if the food overlaps with the snake, and if so, regenerate the food
         if self.food in self.snake:
             self._place_food()
         
@@ -116,13 +128,20 @@ class SnakeGame:
     
     # Method to detect collision    
     def _is_collision(self):
-        #hits boundary
+        # If the head of the snake hits the right boundary of the screen,
+        # move it to the left edge of the screen
         if self.head.x > self.w - BLOCK_SIZE:
             self.head.x = 0
+        # If the head of the snake hits the left boundary of the screen,
+        # move it to the right edge of the screen        
         elif self.head.x < 0:
             self.head.x = self.w - BLOCK_SIZE
+        # If the head of the snake hits the bottom boundary of the screen,
+        # move it to the top edge of the screen    
         elif self.head.y > self.h - BLOCK_SIZE:
             self.head.y = 0
+        # If the head of the snake hits the top boundary of the screen,
+        # move it to the bottom edge of the screen
         elif self.head.y < 0:
             self.head.y = self.h - BLOCK_SIZE
         
@@ -142,38 +161,54 @@ class SnakeGame:
                 pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
                 pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12)) # second slightly smaller rectangle to create 3d effecct 
                 
-        # Draw the food
-        pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE )) 
+        # Load the food image from a file
+        food_img = pygame.image.load("baby.png").convert_alpha()       
+        food_img = pygame.transform.scale(food_img, (BLOCK_SIZE, BLOCK_SIZE))
+        
+        # Draw the food image over the food rectangle
+        self.display.blit(food_img, (self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))        
         
         # Draws the current score and high score
         text_score = font.render("Score: " + str(self.score), True, WHITE)
         #text_high_score = font.render("High Score: " + str(self.high_score), True, WHITE)
         self.display.blit(text_score, [0, 0])
-       # self.display.blit(text_high_score, [self.w - text_high_score.get_width(), 0])
+        # self.display.blit(text_high_score, [self.w - text_high_score.get_width(), 0])
         
         # update the entire display with the new state of the game.
         pygame.display.flip()
     
     def _move(self, direction):
+        # Get the current position of the snake's head
         x = self.head.x
         y = self.head.y
+        
+        # Move the head based on the given direction
         if direction == Direction.RIGHT:
+            # If moving to the right, add BLOCK_SIZE to the x coordinate
             x += BLOCK_SIZE
+            # If the head goes off the right edge of the screen, wrap it around to the left edge
             if x > self.w - BLOCK_SIZE:
                 x = 0
         elif direction == Direction.LEFT:
+            # If moving to the left, subtract BLOCK_SIZE from the x coordinate
             x -= BLOCK_SIZE
+            # If the head goes off the left edge of the screen, wrap it around to the right edge
             if x < 0:
                 x = self.w - BLOCK_SIZE
         elif direction == Direction.DOWN:
+            # If moving down, add BLOCK_SIZE to the y coordinate
             y += BLOCK_SIZE
+            # If the head goes off the bottom edge of the screen, wrap it around to the top edge
             if y > self.h - BLOCK_SIZE:
                 y = 0
         elif direction == Direction.UP:
+            # If moving up, subtract BLOCK_SIZE from the y coordinate
             y -= BLOCK_SIZE
+            # If the head goes off the top edge of the screen, wrap it around to the bottom edge
             if y < 0:
                 y = self.h - BLOCK_SIZE
-            
+                
+        # Update the position of the snake's head    
         self.head = Point(x, y)
     
 if __name__ == '__main__':
