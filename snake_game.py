@@ -53,6 +53,7 @@ class SnakeGame:
                       Point(self.head.x-(2*BLOCK_SIZE), self.head.y)]
         
         self.score = 0 # Initialize the score to 0
+        #self.high_score = 0 # Initialize the high score to 0
         self.food = None # Set food to None until it is placed
         self._place_food() # Place the first food
     
@@ -101,13 +102,17 @@ class SnakeGame:
             self._place_food()
         else:
             self.snake.pop() 
+            
+        # check if the score is higher than the current high score
+        #if self.score > self.high_score:
+            #self.high_score = self.score 
              
         # 5. Update ui and clock
         self._update_ui()
         self.clock.tick(SPEED)
         
         # 6. Return game over and score
-        return game_over, self.score 
+        return game_over, self
     
     # Method to detect collision    
     def _is_collision(self):
@@ -140,9 +145,11 @@ class SnakeGame:
         # Draw the food
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE )) 
         
-        # Draws the current score
-        text = font.render("Score: " + str(self.score), True, WHITE)
-        self.display.blit(text, [0, 0])
+        # Draws the current score and high score
+        text_score = font.render("Score: " + str(self.score), True, WHITE)
+        #text_high_score = font.render("High Score: " + str(self.high_score), True, WHITE)
+        self.display.blit(text_score, [0, 0])
+       # self.display.blit(text_high_score, [self.w - text_high_score.get_width(), 0])
         
         # update the entire display with the new state of the game.
         pygame.display.flip()
@@ -179,8 +186,7 @@ if __name__ == '__main__':
         if game_over == True: # If the game is over, break out of the loop
             break
         
-    print('Final Score', score ) # Print the final score
-            
+    print('Final Score', score ) # Print the final score    
         # Break if game over
             
     pygame.quit() # Quit pygame when the game is over
