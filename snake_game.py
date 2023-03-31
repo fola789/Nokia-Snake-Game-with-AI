@@ -4,6 +4,8 @@ from enum import Enum
 from collections import namedtuple
 
 pygame.init()
+font = pygame.font.Font('arial/arial.ttf', 25) # faster run time 
+#font = pygame.font.SysFont('arial', 25)
 
 class Direction(Enum):
     RIGHT = 1
@@ -13,7 +15,16 @@ class Direction(Enum):
 
 Point = namedtuple('Point', 'x, y')
 
+# rgb colors
+WHITE = (255, 255, 255)
+RED = (200, 0, 0)
+BLUE1 = (0, 0, 255)
+BLUE2 = (0, 100, 255)
+BLACK = (0, 0, 0)
+
 BLOCK_SIZE = 20
+SPEED = 40
+
 class SnakeGame:
     # Initialize the game with a specified width and height
     def __init__(self, w=640, h=480):
@@ -62,12 +73,28 @@ class SnakeGame:
         # 4. Place new food or just move
         
         # 5. Update ui and clock
+        self._update_ui()
+        self.clock.tick(SPEED)
         
         # 6. Return game over and score
         game_over = False # Initialize game over flag to False
         return game_over, self.score # Return the game over flag and current score
         pass
         
+    def _update_ui(self):
+        self.display.fill(BLACK)
+        
+        for pt in self.snake:
+                pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+                pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
+                
+        pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE ))
+        
+        text = font.render("Score: " + str(self.score), True, WHITE)
+        self.display.blit(text, [0, 0])
+        pygame.display.flip()
+    
+    
 if __name__ == '__main__':
     game = SnakeGame()
         
